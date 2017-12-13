@@ -43,7 +43,7 @@ class Config:
     service2Port = 8080
     service2Path = '/opt/dubbo/dubbo-monitor-simple-2.5.3/'
     # 受管服务器配置
-    serverList = 'sso,bis-view,uc-service,uc-view,xtxc-dubbo,xtxc-web,xtxc-ws,xtxc-ws-rest'
+    serverList = 'sso,uc-service,uc-view,xtxc-dubbo,xtxc-web,xtxc-ws,xtxc-ws-rest'
     serverConfig = {
         'AdminServer':7001,
         'sso': 7101,

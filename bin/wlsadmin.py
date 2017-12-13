@@ -68,85 +68,115 @@ def stopService():
         killserver.killProc()
 
 
-# 3.重启基础服务
-def restartService():
-    stopService()
-    startService()
+# # 2.重启基础服务
+# def restartService():
+#     stopService()
+#     startService()
 
 
-# 4.启动服务器
+# 3.启动服务器
 def startserver():
     while True:
-        inputserver = raw_input("请输入要启动服务器名(多个以,隔开):")
-        if inputserver in servers and KillProc(ipAddr, servers[inputserver]).port_check() is not True:
-            optServer(inputserver, 'START')
-            break
-        elif KillProc(ipAddr, servers[inputserver]).port_check():
-            print "%s 服务器已在运行!\n" % inputserver
-            break
-        elif inputserver not in servers:
-            print "%s 服务器不存在请重新输入!\n" % inputserver
+        inputserver = raw_input("请输入服务器名(多个以','隔开):").strip()
+        for server_name in inputserver.split(","):
+            if server_name in servers:
+                server_port = int(servers[server_name])
+                server_status = KillProc(ipAddr, server_port).port_check()
+                if server_status is not True:
+                    optServer(server_name, 'START')
+                elif server_status is True:
+                    print "%s 服务器已在运行!\n" % server_name
+            else:
+                print "%s 服务器不存在!!\n" % server_name
+        break
 
 
-# 5.关闭服务器
+# 4.关闭服务器
 def stopserver():
     while True:
-        inputserver = raw_input("请输入要启动服务器名(多个以,隔开):")
-        if inputserver in servers:
-            optServer(inputserver, 'STOP')
-            break
-        else:
-            print "%s 服务器不存在请重新输入!\n" % inputserver
+        inputserver = raw_input("请输入服务器名(多个以','隔开):").strip()
+        for server_name in inputserver.split(","):
+            if server_name in servers:
+                server_port = int(servers[server_name])
+                server_status = KillProc(ipAddr, server_port).port_check()
+                if server_status is True:
+                    optServer(server_name, 'STOP')
+                elif server_status is not True:
+                    print "%s 服务器已关闭!\n" % server_name
+            else:
+                print "%s 服务器不存在请重新输入!\n" % server_name
+        break
 
 
-# 6.重启服务器
+# 5.重启服务器
 def restartserver():
     while True:
-        inputserver = raw_input("请输入要启动服务器名(多个以,隔开):")
-        if inputserver in servers:
-            port = serverConfig[inputserver]
-            KillProc(ipAddr, port).killProc()
-            optServer(inputserver, 'START')
-            break
-        else:
-            print "%s 服务器不存在请重新输入!\n" % inputserver
+        inputserver = raw_input("请输入服务器名(多个以','隔开):").strip()
+        for server_name in inputserver.split(","):
+            if server_name in servers:
+                server_port = int(servers[server_name])
+                server_status = KillProc(ipAddr, server_port).port_check()
+                if server_status is True:
+                    optServer(server_name, 'STOP')
+                    optServer(server_name, "START")
+                elif server_status is not True:
+                    optServer(server_name, "START")
+            else:
+                print "%s 服务器不存在请重新输入!\n" % server_name
+        break
 
 
-# 7.查看服务器状态
+# 6.查看服务器状态
 def stateserver():
     while True:
-        inputserver = raw_input("请输入要启动服务器名(多个以,隔开):")
+        inputserver = raw_input("请输入服务器名(多个以','隔开):").strip()
+        print "%-14s     :%-4s" % ("服务器名称", "状态")
         for s in inputserver.split(","):
             if s in servers:
                 server_port = servers[s]
                 server_status = KillProc(ipAddr, server_port)
                 if server_status:
-                    print "%s : %s" % (s, "RUNNING")
+                    print "%-14s :%-4s" % (s, "RUNNING")
                 else:
-                    print "%s :%s" % (s, "SHUTDOWN")
+                    print "%-14s :%-4s" % (s, "SHUTDOWN")
             else:
-                print "%s 服务器不存在!\n" % inputserver
+                print "%s 服务器不存在!\n" % s
         break
 
 
-# 8.一键启动所有服务器
+# 7.启动所有服务器
 def start_allservers():
     for server in serverList.split(","):
-        server_status = KillProc(ipAddr, serverConfig[server]).port_check()
-    if server_status:
-        print "%s 服务器已在运行..." % server
-    elif server in servers:
-        optServer(server, "START")
+        if server in servers:
+            server_port = int(servers[server])
+            server_status = KillProc(ipAddr, server_port).port_check()
+            if server_status is True:
+                print "%s 服务器已在运行..." % server
+            else:
+                while KillProc(ipAddr, server_port).port_check() is not True:
+                    optServer(server, "START")
 
 
-# 9.一键查看所有服务器状态
+# 8.查看所有服务器状态
+def state_allservers():
+    print "%-14s :%-4s" % ("服务器名称", "状态")
+    for (server_name, server_port) in servers.items():
+        server_status = KillProc(ipAddr, int(server_port)).port_check()
+        if server_status:
+            print "%-14s :%s" % (server_name, "RUNNING")
+        else:
+            print "%-14s :%s" % (server_name, "SHUTDOWN")
+
+
+# 9.关闭所有服务器
 def stop_allservers():
-    for server in serverList:
-        server_status = KillProc(ipAddr, serverConfig[server]).port_check()
-        if server in servers and server_status is not True:
-            print "%s 服务器已关闭!" % server
-        elif server in servers:
+    for server in serverList.split(","):
+        server_port = int(servers[server])
+        server_status = KillProc(ipAddr, server_port).port_check()
+        if server_status:
             optServer(server, "STOP")
+        else:
+            print "%s 服务器已关闭!" % server
 
 
 # 欢迎菜单
@@ -155,12 +185,12 @@ def interactive():
     --------欢迎使用 WebLogic Server 管理工具 --------
         1. 启动基础服务
         2. 关闭基础服务
-        3. 重启基础服务
-        4. 启动服务器
-        5. 关闭服务器
-        6. 重启服务器
-        7. 查看服务器状态
-        8. 启动所有服务器
+        3. 启动服务器
+        4. 关闭服务器
+        5. 重启服务器
+        6. 查看服务器状态
+        7. 启动所有服务器
+        8. 所有服务器状态
         9. 关闭所有服务器
         0. 退出程序
     -----------------------------------------------
@@ -168,12 +198,12 @@ def interactive():
     menu_dict = {
         '1': 'startService()',
         '2': 'stopService()',
-        '3': 'restartService()',
-        '4': 'startserver()',
-        '5': 'stopserver()',
-        '6': 'restartserver()',
-        '7': 'stateserver()',
-        '8': 'start_allservers()',
+        '3': 'startserver()',
+        '4': 'stopserver()',
+        '5': 'restartserver()',
+        '6': 'stateserver()',
+        '7': 'start_allservers()',
+        '8': 'state_allservers()',
         '9': 'stop_allservers()',
         '0': 'sys.exit()'
     }
@@ -188,7 +218,15 @@ def interactive():
 
 
 if __name__ == "__main__":
+    """
+    根据传参选择启动方式:
+    # 1.交互式
+    python bin/wlsadmin.py
+    # 2.非交互式(直接启动所有服务)
+    python bin/wlsadmin.py server
+    """
     if len(sys.argv[1:]) == 0:
+        startService()
         interactive()
     elif len(sys.argv[1:]) >= 1 and sys.argv[1] == "server":
         startService()
