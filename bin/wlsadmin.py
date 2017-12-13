@@ -147,7 +147,6 @@ def stop_allservers():
 def interactive():
     menu = """
     --------欢迎使用 WebLogic Server 管理工具 --------
-
         1. 启动基础服务
         2. 关闭基础服务
         3. 重启基础服务
