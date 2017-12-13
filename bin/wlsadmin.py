@@ -116,11 +116,17 @@ def restartserver():
 def stateserver():
     while True:
         inputserver = raw_input("请输入要启动服务器名(多个以,隔开):")
-        if inputserver in servers:
-            optServer(inputserver, 'STATE')
-            break
-        else:
-            print "%s 服务器不存在请重新输入!\n" % inputserver
+        for s in inputserver.split(","):
+            if s in servers:
+                server_port = servers[s]
+                server_status = KillProc(ipAddr, server_port)
+                if server_status:
+                    print "%s : %s" % (s, "RUNNING")
+                else:
+                    print "%s :%s" % (s, "SHUTDOWN")
+            else:
+                print "%s 服务器不存在!\n" % inputserver
+        break
 
 
 # 8.一键启动所有服务器

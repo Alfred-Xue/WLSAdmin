@@ -6,8 +6,6 @@
 # @E-Mail   : Alfred.Hsueh@gmail.com
 # @GitHub   : https://github.com/Alfred-Xue
 # @Blog     : http://www.cnblogs.com/alfred0311/
-import os
-import sys
 import commands
 from core.createscript import createscript
 
